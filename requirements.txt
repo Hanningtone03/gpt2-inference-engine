@@ -1,0 +1,5 @@
+numpy
+regex
+safetensors
+huggingface_hub
+pytest

@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+*.pyc
+models/gpt2-124m/
+.pytest_cache/
