@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from byte_encoder import bytes_to_unicode, encode_bytes_to_unicode, decode_unicode_to_bytes
 

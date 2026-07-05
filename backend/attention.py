@@ -66,3 +66,36 @@ def causal_self_attention_with_cache(x_new, c_attn_weight, c_attn_bias, c_proj_w
 
     merged = merge_heads(attn_out)
     return merged @ c_proj_weight + c_proj_bias
+
+
+def causal_self_attention_with_cache_and_weights(x_new, c_attn_weight, c_attn_bias, c_proj_weight, c_proj_bias,
+                                                    n_head, layer_cache, layer_idx, position_offset):
+    import numpy as np
+    new_len, n_embd = x_new.shape
+
+    qkv = x_new @ c_attn_weight + c_attn_bias
+    q, k_new, v_new = np.split(qkv, 3, axis=-1)
+
+    q = split_heads(q, n_head)
+    k_new = split_heads(k_new, n_head)
+    v_new = split_heads(v_new, n_head)
+
+    k_all, v_all = layer_cache.update(layer_idx, k_new, v_new)
+
+    head_dim = n_embd // n_head
+    scores = (q @ k_all.transpose(0, 2, 1)) / np.sqrt(head_dim)
+
+    total_len = k_all.shape[1]
+    query_positions = np.arange(position_offset, position_offset + new_len).reshape(-1, 1)
+    key_positions = np.arange(total_len).reshape(1, -1)
+    causal_mask = key_positions > query_positions
+
+    scores = np.where(causal_mask, -np.inf, scores)
+    weights = softmax(scores, axis=-1)
+    attn_out = weights @ v_all
+
+    merged = merge_heads(attn_out)
+    output = merged @ c_proj_weight + c_proj_bias
+
+    avg_weights = weights.mean(axis=0)
+    return output, avg_weights

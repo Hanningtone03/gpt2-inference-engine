@@ -84,3 +84,13 @@ class BPETokenizer:
     def decode(self, token_ids):
         text = "".join(self.decoder[t] for t in token_ids)
         return decode_unicode_to_bytes(text).decode("utf-8", errors="replace")
+
+    def encode_with_pieces(self, text):
+        pieces = []
+        for chunk in GPT2_SPLIT_PATTERN.findall(text):
+            chunk_bytes_encoded = encode_bytes_to_unicode(chunk)
+            for bpe_token in self.bpe(chunk_bytes_encoded).split(" "):
+                token_id = self.encoder[bpe_token]
+                piece_text = decode_unicode_to_bytes(bpe_token).decode("utf-8", errors="replace")
+                pieces.append({"id": token_id, "text": piece_text})
+        return pieces

@@ -1,7 +1,7 @@
 import sys
 import os
 import numpy as np
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from attention import causal_self_attention, split_heads, merge_heads
 
