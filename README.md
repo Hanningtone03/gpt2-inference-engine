@@ -2,7 +2,7 @@
 
 # gpt2-inference-engine
 
-GPT-2 inference implemented entirely from scratch in NumPy — no PyTorch, no TensorFlow, no ML framework of any kind. Real pretrained GPT-2 124M weights, hand-written attention, layer norm, and sampling.
+GPT-2 inference implemented in NumPy. Pretrained GPT-2 124M weights, hand-written attention, layer norm, and sampling.
 
 ## How it works
 
