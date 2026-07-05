@@ -8,6 +8,17 @@
 <body>
   <canvas id="bgCanvas"></canvas>
 
+  <div id="introOverlay" class="intro-overlay">
+    <div class="terminal-content">
+      <div class="terminal-header">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="terminal-title">gpt2-inference-engine ~ boot sequence</span>
+      </div>
+      <div class="terminal-body" id="terminalBody"></div>
+      <button id="introStartBtn" class="terminal-enter hidden">Enter</button>
+    </div>
+  </div>
+
   <div class="container">
     <div class="header">
       <div class="badge">GPT-2 124M</div>
@@ -15,26 +26,34 @@
     </div>
 
     <div class="settings-bar">
-      <label>Strategy
+      <label>Style
         <select id="strategy">
-          <option value="top_k" selected>Top-K</option>
-          <option value="top_p">Top-P (nucleus)</option>
-          <option value="temperature">Temperature</option>
-          <option value="greedy">Greedy</option>
+          <option value="top_k" selected>Balanced</option>
+          <option value="top_p">Adaptive</option>
+          <option value="temperature">Creative</option>
+          <option value="greedy">Most Likely</option>
         </select>
       </label>
       <label>Max tokens
         <input type="number" id="maxTokens" value="60" min="10" max="200">
       </label>
-      <label>Temperature
-        <input type="range" id="temperature" min="0.1" max="1.5" step="0.1" value="0.8">
-        <span id="tempValue">0.8</span>
+      <label>Randomness (temperature)
+        <input type="range" id="temperature" min="0.1" max="1.5" step="0.1" value="0.8" class="temp-slider">
+        <span id="tempValue">0.8 — balanced</span>
       </label>
+      <button id="compareBtn">Compare Strategies</button>
     </div>
+
+    <p class="legend">Word color = the model's confidence in that exact word. <span class="legend-swatch legend-high">green</span> = confident, <span class="legend-swatch legend-low">red</span> = uncertain/riskier pick.</p>
+
+    <div class="tokenizer-panel" id="tokenizerPanel"></div>
+    <div class="attention-panel" id="attentionPanel"></div>
 
     <div class="chat-window" id="chatWindow">
       <div class="empty-state">Type a prompt below to begin generating.</div>
     </div>
+
+    <div class="stats-bar" id="statsBar"></div>
 
     <div class="input-bar">
       <input type="text" id="promptInput" placeholder="Type a prompt and press Enter...">
@@ -42,7 +61,43 @@
     </div>
   </div>
 
+  <div id="compareModal" class="modal hidden">
+    <div class="modal-content compare-content">
+      <h2>Strategy Comparison</h2>
+      <div class="compare-selectors">
+        <select id="strategyA">
+          <option value="greedy" selected>Most Likely</option>
+          <option value="top_k">Balanced</option>
+          <option value="top_p">Adaptive</option>
+          <option value="temperature">Creative</option>
+        </select>
+        <span>vs</span>
+        <select id="strategyB">
+          <option value="greedy">Most Likely</option>
+          <option value="top_k" selected>Balanced</option>
+          <option value="top_p">Adaptive</option>
+          <option value="temperature">Creative</option>
+        </select>
+      </div>
+      <div class="compare-results">
+        <div class="compare-column">
+          <h3 id="labelA">Most Likely</h3>
+          <div id="resultA" class="compare-text"></div>
+        </div>
+        <div class="compare-column">
+          <h3 id="labelB">Balanced</h3>
+          <div id="resultB" class="compare-text"></div>
+        </div>
+      </div>
+      <div class="compare-actions">
+        <button id="runCompareBtn">Run Comparison</button>
+        <button id="closeCompareBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="background.js"></script>
+  <script src="intro.js"></script>
   <script src="chat.js"></script>
 </body>
 </html>

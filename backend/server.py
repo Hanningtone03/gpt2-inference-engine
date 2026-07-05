@@ -3,9 +3,9 @@ import sys
 import os
 import time
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_from_directory
 from flask_cors import CORS
 import numpy as np
 
@@ -16,10 +16,12 @@ from kv_cache import KVCache
 from sampling import greedy_sample, temperature_sample, top_k_sample, top_p_sample
 from ops import softmax
 
-MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "models", "gpt2-124m")
-MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "..", "models", "gpt2-124m")
+MODELS_DIR = os.path.join(BASE_DIR, "..", "models")
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 CORS(app)
 
 print("loading weights...")
@@ -53,6 +55,11 @@ def top_candidates(logits, n=5):
     ]
 
 
+@app.route("/")
+def index():
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+
 @app.route("/api/tokenize", methods=["POST"])
 def tokenize():
     data = request.get_json()
@@ -75,7 +82,6 @@ def chat():
     def stream():
         rng = np.random.default_rng(seed)
         token_ids = tokenizer.encode(prompt)
-        prompt_len = len(token_ids)
         cache = KVCache(model.weights.n_layer)
 
         start_time = time.time()
@@ -152,5 +158,5 @@ def health():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
+    port = int(os.environ.get("PORT", 8091))
     app.run(host="0.0.0.0", port=port, threaded=True)

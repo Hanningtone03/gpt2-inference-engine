@@ -8,16 +8,17 @@ function resizeBg() {
 window.addEventListener('resize', resizeBg);
 resizeBg();
 
-const NODE_COUNT = 60;
+const NODE_COUNT = 70;
 const nodes = Array.from({ length: NODE_COUNT }, () => ({
   x: Math.random() * bgCanvas.width,
   y: Math.random() * bgCanvas.height,
   vx: (Math.random() - 0.5) * 0.3,
   vy: (Math.random() - 0.5) * 0.3,
+  hue: Math.random() > 0.5 ? 175 : 300,
 }));
 
 function step() {
-  bgCtx.fillStyle = 'rgba(11, 10, 8, 1)';
+  bgCtx.fillStyle = 'rgba(5, 7, 13, 1)';
   bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
   for (const n of nodes) {
@@ -31,8 +32,8 @@ function step() {
     for (let j = i + 1; j < nodes.length; j++) {
       const a = nodes[i], b = nodes[j];
       const dist = Math.hypot(a.x - b.x, a.y - b.y);
-      if (dist < 140) {
-        bgCtx.strokeStyle = `rgba(224, 165, 66, ${0.12 * (1 - dist / 140)})`;
+      if (dist < 150) {
+        bgCtx.strokeStyle = `hsla(${(a.hue + b.hue) / 2}, 80%, 65%, ${0.1 * (1 - dist / 150)})`;
         bgCtx.lineWidth = 1;
         bgCtx.beginPath();
         bgCtx.moveTo(a.x, a.y);
@@ -43,7 +44,7 @@ function step() {
   }
 
   for (const n of nodes) {
-    bgCtx.fillStyle = 'rgba(224, 165, 66, 0.4)';
+    bgCtx.fillStyle = `hsla(${n.hue}, 90%, 65%, 0.5)`;
     bgCtx.beginPath();
     bgCtx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
     bgCtx.fill();
